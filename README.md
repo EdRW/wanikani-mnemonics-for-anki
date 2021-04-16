@@ -1,6 +1,6 @@
 # Wanikani Mnemonics for Anki
 
-An add on for Anki 2.1 that allows you add mnemonics to your flashcards from Wanikani.
+An add on for Anki 2.1 that helps you add mnemonics to your flashcards from Wanikani.
 
 ### How to install
 
@@ -30,7 +30,7 @@ The config is a simple config.json:
 
 Add this styling to your card in order to get Wanikani style color highlighting.
 
-Note: The colors will not be dislayed while editing the card but they will be displayed when viewing them during reviews.
+Note: The colors will not be displayed while editing the card but they will be displayed when viewing them during reviews.
 
 ```css
 vocabulary {
