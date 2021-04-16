@@ -2,6 +2,13 @@
 
 An add on for Anki 2.1 that allows you add mnemonics to your flashcards from Wanikani.
 
+### How to install
+
+- Find the Anki add-ons folder by going to the Tools>Add-ons menu item in the main Anki window.
+- Click on the View Files button, and a folder will pop up.
+- Download this project and place it inside of the folder that opened.
+- Now restart Anki.
+
 ### Configuration
 
 Anki allows users to configure this add-on from the add-on manager.
@@ -21,7 +28,9 @@ The config is a simple config.json:
 
 ### Styling
 
-Add this styling to your card
+Add this styling to your card in order to get Wanikani style color highlighting.
+
+Note: The colors will not be dislayed while editing the card but they will be displayed when viewing them during reviews.
 
 ```css
 vocabulary {
