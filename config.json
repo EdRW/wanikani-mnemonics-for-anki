@@ -1,6 +1,8 @@
 {
     "wanikaniApiKey": "ENTER-YOUR-API-KEY",
+    "source_field": "NAME-OF-CARD-FIELD",
     "meaning_mnemonic_field": "NAME-OF-CARD-FIELD",
     "reading_mnemonic_field": "NAME-OF-CARD-FIELD",
+    "individual_kanji_mnemonics": true,
     "auto_mode": false
 }

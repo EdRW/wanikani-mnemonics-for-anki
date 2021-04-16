@@ -6,37 +6,71 @@ from PyQt5.QtWidgets import QAction, QMenu
 from aqt import gui_hooks
 from anki.notes import Note
 from aqt.editor import EditorWebView
-from aqt.utils import showInfo, qconnect
+from aqt.utils import qconnect
 
 from .src import config
+from .src.mnemonics import add_meaning_mnemonic_to_note, add_reading_mnemonic_to_note
 
+source_field_name = config['source_field']
 meaning_mnemonic_field_name = config['meaning_mnemonic_field']
 reading_mnemonic_field_name = config['reading_mnemonic_field']
+individual_kanji_mnemonics = config['individual_kanji_mnemonics']
 
 if config['auto_mode']:
 
     def unfocus_callback(changed: bool, note: Note,
                          current_field_idx: int) -> bool:
-        showInfo(
-            f'Updating fields: {meaning_mnemonic_field_name} and {reading_mnemonic_field_name}'
-        )
-        return changed
+        """Handles the updating of the note after a field has been unfocused
+
+        Args:
+            changed (bool): where or not a previous filter has changed the note in this call
+            note (Note): the note to be updated
+            current_field_idx (int): the index of the field that was just unfocused
+
+        Returns:
+            bool: If no changes made to note then returns the changed flag the same as it received it; if it makes a change it returns True.
+        """
+        meaning_success = add_meaning_mnemonic_to_note(
+            note=note,
+            scr_field=source_field_name,
+            mnemonic_field=meaning_mnemonic_field_name,
+            individual=individual_kanji_mnemonics,
+            triggered_field_index=current_field_idx)
+        reading_success = add_reading_mnemonic_to_note(
+            note=note,
+            scr_field=source_field_name,
+            mnemonic_field=reading_mnemonic_field_name,
+            individual=individual_kanji_mnemonics,
+            triggered_field_index=current_field_idx)
+        return meaning_success or reading_success
 
     gui_hooks.editor_did_unfocus_field.append(unfocus_callback)
 
 
 def context_menu_callback(editor_webview: EditorWebView, menu: QMenu) -> None:
     note: Optional[Note] = editor_webview.editor.note
-    if not note:
-        raise ValueError
 
     def add_meaning_mnemonic():
-        note
-        showInfo(f'Updating field: {meaning_mnemonic_field_name}')
+        if not note:
+            raise ValueError
+        success = add_meaning_mnemonic_to_note(
+            note=note,
+            scr_field=source_field_name,
+            mnemonic_field=meaning_mnemonic_field_name,
+            individual=individual_kanji_mnemonics)
+        if success:
+            editor_webview.editor.loadNote()
 
     def add_reading_mnemonic():
-        note
-        showInfo(f'Updating field: {reading_mnemonic_field_name}')
+        if not note:
+            raise ValueError
+        success = add_reading_mnemonic_to_note(
+            note=note,
+            scr_field=source_field_name,
+            mnemonic_field=reading_mnemonic_field_name,
+            individual=individual_kanji_mnemonics)
+        if success:
+            editor_webview.editor.loadNote()
 
     add_meaning_mnemonic_action = QAction('Add meaning mnemonic from Wanikani',
                                           mw)

@@ -7,8 +7,10 @@ from aqt import mw
 
 class Config(TypedDict):
     wanikaniApiKey: str
+    source_field: str
     meaning_mnemonic_field: str
     reading_mnemonic_field: str
+    individual_kanji_mnemonics: bool
     auto_mode: bool
 
 

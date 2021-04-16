@@ -1,4 +1,5 @@
-# pyright: basic
+# pyright: reportMissingTypeStubs=false
+
 from setuptools import setup, find_packages
 
 REQUIRED_PACKAGES = ['aqt~=2.1.35']

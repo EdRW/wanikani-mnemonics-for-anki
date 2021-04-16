@@ -1,5 +1,6 @@
 from abc import ABC
-from typing import Any, Dict, List, Literal, TypedDict
+from typing import Any, Dict, List, TypedDict
+from enum import Enum
 from dataclasses import dataclass
 
 
@@ -11,20 +12,31 @@ class WkCollection(TypedDict):
     data: List[Dict[str, Any]]
 
 
+class WkObjectType(Enum):
+    kanji = 'kanji'
+    vocabulary = 'vocabulary'
+
+
 @dataclass
 class WkSubject(ABC):
     id: int
-    object: Literal['kanji', 'vocabulary']
+    object: WkObjectType
     characters: str
+    meaning: str
     meaning_mnemonic: str
     reading_mnemonic: str
 
     def __init__(self, source: Dict[str, Any]):
         self.id = source['id']
-        self.object = source['object']
+        self.object = WkObjectType[source['object']]
         self.characters = source['data']['characters']
         self.meaning_mnemonic = source['data']['meaning_mnemonic']
         self.reading_mnemonic = source['data']['reading_mnemonic']
+        self.meaning = ''
+        for meaning in source['data']['meanings']:
+            if meaning['primary']:
+                self.meaning = meaning['meaning']
+                break
 
 
 @dataclass
@@ -67,8 +79,8 @@ class WkVocab(WkSubject):
 
 
 def wk_subject_factory(source: Dict[str, Any]) -> WkSubject:
-    if source['object'] == 'kanji':
+    if source['object'] == WkObjectType.kanji.value:
         return WkKanji(source)
-    elif source['object'] == 'vocabulary':
+    elif source['object'] == WkObjectType.vocabulary.value:
         return WkVocab(source)
     raise ValueError('Dict is not a valid wk_subject')
