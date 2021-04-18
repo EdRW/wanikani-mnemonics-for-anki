@@ -42,6 +42,8 @@ if config['auto_mode']:
             mnemonic_field=reading_mnemonic_field_name,
             individual=individual_kanji_mnemonics,
             triggered_field_index=current_field_idx)
+        if note.id:
+            note.flush()
         return meaning_success or reading_success
 
     gui_hooks.editor_did_unfocus_field.append(unfocus_callback)
@@ -59,7 +61,12 @@ def context_menu_callback(editor_webview: EditorWebView, menu: QMenu) -> None:
             mnemonic_field=meaning_mnemonic_field_name,
             individual=individual_kanji_mnemonics)
         if success:
-            editor_webview.editor.loadNote()
+            if note.id:
+                # note is being created
+                editor_webview.editor.loadNote()
+            else:
+                # note already exists
+                note.flush()
 
     def add_reading_mnemonic():
         if not note:
@@ -70,7 +77,12 @@ def context_menu_callback(editor_webview: EditorWebView, menu: QMenu) -> None:
             mnemonic_field=reading_mnemonic_field_name,
             individual=individual_kanji_mnemonics)
         if success:
-            editor_webview.editor.loadNote()
+            if note.id:
+                # note is being created
+                editor_webview.editor.loadNote()
+            else:
+                # note already exists
+                note.flush()
 
     add_meaning_mnemonic_action = QAction('Add meaning mnemonic from Wanikani',
                                           mw)
