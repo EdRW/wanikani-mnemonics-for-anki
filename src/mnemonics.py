@@ -63,7 +63,7 @@ def add_wk_mnemonic_to_note(
         if src_index != triggered_field_index:
             return False
 
-    scr_text = strip_out_kanji(note[scr_field])
+    scr_text = stripHTML(note[scr_field])
     # showInfo(f'og text: {note[scr_field]}\nsearch text: {scr_text}')
     # source field is blank
     if not scr_text:
@@ -74,31 +74,36 @@ def add_wk_mnemonic_to_note(
     vocab_subject: Optional[WkSubject] = wankani_vocab(scr_text)
 
     if vocab_subject:
-        mnemonic_string_list.append(': '.join(
-            [f'<vocabulary>{scr_text}</vocabulary>', vocab_subject.meaning]))
+        mnemonic_string_list.append(': '.join([
+            f'<vocabulary>{scr_text}</vocabulary>',
+            f'<b>{vocab_subject.meaning}</b>'
+        ]))
         vocab_mnemonic = (vocab_subject.reading_mnemonic
                           if mnemonic_type is MnemonicType.reading else
                           vocab_subject.meaning_mnemonic)
         mnemonic_string_list.append(vocab_mnemonic)
     else:
         mnemonic_string_list.append(
-            f'<vocabulary>{scr_text}</vocabulary>: Unknown<br>'
+            f'<vocabulary>{scr_text}</vocabulary>: <b>Unknown</b><br>'
             f"~😿 We couldn't find a mnemonic for {scr_text} on wanikani, "
             "But we encourage you to try writing your own! 😺~")
 
     if individual:
-        for kanji in scr_text:
+        kanji_only = strip_out_kanji(note[scr_field])
+        for kanji in kanji_only:
             kanji_subject: Optional[WkSubject] = wankani_kanji(kanji)
             if kanji_subject:
-                mnemonic_string_list.append(': '.join(
-                    [f'<kanji>{kanji}</kanji>', kanji_subject.meaning]))
+                mnemonic_string_list.append(': '.join([
+                    f'<kanji>{kanji}</kanji>',
+                    f'<b>{kanji_subject.meaning}</b>'
+                ]))
                 kanji_mnemonic = (kanji_subject.reading_mnemonic
                                   if mnemonic_type is MnemonicType.reading else
                                   kanji_subject.meaning_mnemonic)
                 mnemonic_string_list.append(kanji_mnemonic)
             else:
                 mnemonic_string_list.append(
-                    f'<kanji>{kanji}</kanji>: Unknown<br>'
+                    f'<kanji>{kanji}</kanji>: <b>Unknown</b><br>'
                     f"~😿 We couldn't find a mnemonic for {kanji} on wanikani, "
                     "But we encourage you to try writing your own! 😺~")
 
@@ -130,8 +135,8 @@ def get_field_index(note: Note, field: str) -> int:
 def strip_out_kanji(src_text: str) -> str:
     """Remove all html and return only the kanji.
     """
-    stripped_text = stripHTML(src_text)
-    return ''.join([char for char in stripped_text if is_kanji(char)])
+    # stripped_text = stripHTML(src_text)
+    return ''.join([char for char in src_text if is_kanji(char)])
 
 
 def is_kanji(char: str):
