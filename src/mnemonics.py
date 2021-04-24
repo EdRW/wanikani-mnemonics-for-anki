@@ -19,12 +19,16 @@ def add_reading_mnemonic_to_note(
         note: Note,
         src_field: str,
         mnemonic_field: str,
-        individual: bool = False,
+        get_vocab_mnemonics: bool = False,
+        get_kanji_mnemonics: bool = False,
+        get_radical_mnemonics: bool = False,
         triggered_field_index: Optional[int] = None) -> bool:
     return add_wk_mnemonic_to_note(note=note,
                                    src_field=src_field,
                                    mnemonic_field=mnemonic_field,
-                                   individual=individual,
+                                   get_vocab_mnemonics=get_vocab_mnemonics,
+                                   get_kanji_mnemonics=get_kanji_mnemonics,
+                                   get_radical_mnemonics=get_radical_mnemonics,
                                    mnemonic_type=MnemonicType.reading,
                                    triggered_field_index=triggered_field_index)
 
@@ -33,12 +37,16 @@ def add_meaning_mnemonic_to_note(
         note: Note,
         src_field: str,
         mnemonic_field: str,
-        individual: bool = False,
+        get_vocab_mnemonics: bool = False,
+        get_kanji_mnemonics: bool = False,
+        get_radical_mnemonics: bool = False,
         triggered_field_index: Optional[int] = None) -> bool:
     return add_wk_mnemonic_to_note(note=note,
                                    src_field=src_field,
                                    mnemonic_field=mnemonic_field,
-                                   individual=individual,
+                                   get_vocab_mnemonics=get_vocab_mnemonics,
+                                   get_kanji_mnemonics=get_kanji_mnemonics,
+                                   get_radical_mnemonics=get_radical_mnemonics,
                                    mnemonic_type=MnemonicType.meaning,
                                    triggered_field_index=triggered_field_index)
 
@@ -47,7 +55,9 @@ def add_wk_mnemonic_to_note(
         note: Note,
         src_field: str,
         mnemonic_field: str,
-        individual: bool,
+        get_vocab_mnemonics: bool,
+        get_kanji_mnemonics: bool,
+        get_radical_mnemonics: bool,
         mnemonic_type: MnemonicType,
         triggered_field_index: Optional[int] = None) -> bool:
     # field missing from note?
@@ -71,24 +81,25 @@ def add_wk_mnemonic_to_note(
 
     mnemonic_string_list: List[str] = []
 
-    vocab_subject: Optional[WkSubject] = wankani_vocab(src_text)
+    if get_vocab_mnemonics:
+        vocab_subject: Optional[WkSubject] = wankani_vocab(src_text)
 
-    if vocab_subject:
-        mnemonic_string_list.append(': '.join([
-            f'<vocabulary>{src_text}</vocabulary>',
-            f'<b>{vocab_subject.meaning}</b>'
-        ]))
-        vocab_mnemonic = (vocab_subject.reading_mnemonic
-                          if mnemonic_type is MnemonicType.reading else
-                          vocab_subject.meaning_mnemonic)
-        mnemonic_string_list.append(vocab_mnemonic)
-    else:
-        mnemonic_string_list.append(
-            f'<vocabulary>{src_text}</vocabulary>: <b>Unknown</b><br>'
-            f"~😿 We couldn't find a mnemonic for {src_text} on wanikani, "
-            "But we encourage you to try writing your own! 😺~")
+        if vocab_subject:
+            mnemonic_string_list.append(': '.join([
+                f'<vocabulary>{src_text}</vocabulary>',
+                f'<b>{vocab_subject.meaning}</b>'
+            ]))
+            vocab_mnemonic = (vocab_subject.reading_mnemonic
+                              if mnemonic_type is MnemonicType.reading else
+                              vocab_subject.meaning_mnemonic)
+            mnemonic_string_list.append(vocab_mnemonic)
+        else:
+            mnemonic_string_list.append(
+                f'<vocabulary>{src_text}</vocabulary>: <b>Unknown</b><br>'
+                f"~😿 We couldn't find a mnemonic for {src_text} on wanikani, "
+                "But we encourage you to try writing your own! 😺~")
 
-    if individual:
+    if get_kanji_mnemonics:
         kanji_only = strip_out_kanji(note[src_field])
         for kanji in kanji_only:
             # TODO Only use the wanikani kanji if there is no radical of the same character

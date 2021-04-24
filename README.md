@@ -17,12 +17,14 @@ The config is a simple config.json:
 
 ```json
 {
-  "wanikaniApiKey": "ENTER-YOUR-API-KEY",
-  "source_field": "NAME-OF-CARD-FIELD",
+  "auto_mode": false,
+  "get_kanji_mnemonics": true,
+  "get_radical_mnemonics": true,
+  "get_vocab_mnemonics": true,
   "meaning_mnemonic_field": "NAME-OF-CARD-FIELD",
   "reading_mnemonic_field": "NAME-OF-CARD-FIELD",
-  "individual_kanji_mnemonics": true,
-  "auto_mode": false
+  "source_field": "NAME-OF-CARD-FIELD",
+  "wanikaniApiKey": "ENTER-YOUR-API-KEY"
 }
 ```
 

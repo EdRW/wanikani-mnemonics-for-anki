@@ -1,6 +1,7 @@
 # pyright: reportUnknownMemberType=false
 
 from typing import Optional
+from anki.hooks import addHook
 from aqt import mw
 from PyQt5.QtWidgets import QAction, QMenu
 from aqt import gui_hooks
@@ -33,27 +34,34 @@ def unfocus_callback(changed: bool, note: Note,
     source_field_name = config['source_field']
     meaning_mnemonic_field_name = config['meaning_mnemonic_field']
     reading_mnemonic_field_name = config['reading_mnemonic_field']
-    individual_kanji_mnemonics = config.get('individual_kanji_mnemonics',
-                                            False)
+    get_vocab_mnemonics = config.get('get_vocab_mnemonics', False)
+    get_kanji_mnemonics = config.get('get_kanji_mnemonics', False)
+    get_radical_mnemonics = config.get('get_radical_mnemonics', False)
 
     meaning_success = add_meaning_mnemonic_to_note(
         note=note,
         src_field=source_field_name,
         mnemonic_field=meaning_mnemonic_field_name,
-        individual=individual_kanji_mnemonics,
+        get_vocab_mnemonics=get_vocab_mnemonics,
+        get_kanji_mnemonics=get_kanji_mnemonics,
+        get_radical_mnemonics=get_radical_mnemonics,
         triggered_field_index=current_field_idx)
     reading_success = add_reading_mnemonic_to_note(
         note=note,
         src_field=source_field_name,
         mnemonic_field=reading_mnemonic_field_name,
-        individual=individual_kanji_mnemonics,
+        get_vocab_mnemonics=get_vocab_mnemonics,
+        get_kanji_mnemonics=get_kanji_mnemonics,
+        get_radical_mnemonics=get_radical_mnemonics,
         triggered_field_index=current_field_idx)
-    if note.id:
-        note.flush()
-    return meaning_success or reading_success
+    # if note.id:
+    #     note.flush()
+    return meaning_success or reading_success or changed
 
 
-gui_hooks.editor_did_unfocus_field.append(unfocus_callback)
+addHook('editFocusLost', unfocus_callback)
+# ! gui_hooks.editor_did_unfocus_field doesn't work well in Browser editor window
+# gui_hooks.editor_did_unfocus_field.append(unfocus_callback)
 
 
 def context_menu_callback(editor_webview: EditorWebView, menu: QMenu) -> None:
@@ -61,8 +69,9 @@ def context_menu_callback(editor_webview: EditorWebView, menu: QMenu) -> None:
     source_field_name = config['source_field']
     meaning_mnemonic_field_name = config['meaning_mnemonic_field']
     reading_mnemonic_field_name = config['reading_mnemonic_field']
-    individual_kanji_mnemonics = config.get('individual_kanji_mnemonics',
-                                            False)
+    get_vocab_mnemonics = config.get('get_vocab_mnemonics', False)
+    get_kanji_mnemonics = config.get('get_kanji_mnemonics', False)
+    get_radical_mnemonics = config.get('get_radical_mnemonics', False)
 
     note: Optional[Note] = editor_webview.editor.note
 
@@ -73,7 +82,7 @@ def context_menu_callback(editor_webview: EditorWebView, menu: QMenu) -> None:
             note=note,
             src_field=source_field_name,
             mnemonic_field=meaning_mnemonic_field_name,
-            individual=individual_kanji_mnemonics)
+            get_kanji_mnemonics=get_kanji_mnemonics)
         if success:
             editor_webview.editor.loadNote()
             # if note.id:
@@ -90,7 +99,10 @@ def context_menu_callback(editor_webview: EditorWebView, menu: QMenu) -> None:
             note=note,
             src_field=source_field_name,
             mnemonic_field=reading_mnemonic_field_name,
-            individual=individual_kanji_mnemonics)
+            get_vocab_mnemonics=get_vocab_mnemonics,
+            get_kanji_mnemonics=get_kanji_mnemonics,
+            get_radical_mnemonics=get_radical_mnemonics,
+        )
         if success:
             editor_webview.editor.loadNote()
             # if note.id:

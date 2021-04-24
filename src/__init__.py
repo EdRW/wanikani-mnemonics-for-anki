@@ -10,7 +10,9 @@ class Config(TypedDict):
     source_field: str
     meaning_mnemonic_field: str
     reading_mnemonic_field: str
-    individual_kanji_mnemonics: bool
+    get_vocab_mnemonics: bool
+    get_kanji_mnemonics: bool
+    get_radical_mnemonics: bool
     auto_mode: bool
 
 
