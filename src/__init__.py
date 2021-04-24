@@ -1,6 +1,6 @@
 # pyright: reportUnknownMemberType=false
 import json
-from typing import TypedDict
+from typing import Optional, TypedDict
 
 from aqt import mw
 
@@ -14,10 +14,12 @@ class Config(TypedDict):
     auto_mode: bool
 
 
-config: Config
-
-if mw is None:
-    with open('config.dev.json') as file:
-        config = json.load(file)
-else:
-    config = mw.addonManager.getConfig(__name__)
+def get_config() -> Config:
+    if mw is None:
+        with open('config.dev.json') as file:
+            return json.load(file)
+    else:
+        config: Optional[Config] = mw.addonManager.getConfig(__name__)
+        if not config:
+            raise ValueError()
+        return config

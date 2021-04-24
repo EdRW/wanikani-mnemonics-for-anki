@@ -1,3 +1,3 @@
 from src.wanikani import search_wk
 
-search_wk('十')
+print(search_wk('至る'))

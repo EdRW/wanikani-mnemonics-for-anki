@@ -17,12 +17,12 @@ class MnemonicType(Enum):
 
 def add_reading_mnemonic_to_note(
         note: Note,
-        scr_field: str,
+        src_field: str,
         mnemonic_field: str,
         individual: bool = False,
         triggered_field_index: Optional[int] = None) -> bool:
     return add_wk_mnemonic_to_note(note=note,
-                                   scr_field=scr_field,
+                                   src_field=src_field,
                                    mnemonic_field=mnemonic_field,
                                    individual=individual,
                                    mnemonic_type=MnemonicType.reading,
@@ -31,12 +31,12 @@ def add_reading_mnemonic_to_note(
 
 def add_meaning_mnemonic_to_note(
         note: Note,
-        scr_field: str,
+        src_field: str,
         mnemonic_field: str,
         individual: bool = False,
         triggered_field_index: Optional[int] = None) -> bool:
     return add_wk_mnemonic_to_note(note=note,
-                                   scr_field=scr_field,
+                                   src_field=src_field,
                                    mnemonic_field=mnemonic_field,
                                    individual=individual,
                                    mnemonic_type=MnemonicType.meaning,
@@ -45,13 +45,13 @@ def add_meaning_mnemonic_to_note(
 
 def add_wk_mnemonic_to_note(
         note: Note,
-        scr_field: str,
+        src_field: str,
         mnemonic_field: str,
         individual: bool,
         mnemonic_type: MnemonicType,
         triggered_field_index: Optional[int] = None) -> bool:
     # field missing from note?
-    if not valid_note_fields(note, [scr_field, mnemonic_field]):
+    if not valid_note_fields(note, [src_field, mnemonic_field]):
         return False
 
     # field already filled?
@@ -59,23 +59,23 @@ def add_wk_mnemonic_to_note(
         return False
 
     if triggered_field_index is not None:
-        src_index = get_field_index(note, scr_field)
+        src_index = get_field_index(note, src_field)
         if src_index != triggered_field_index:
             return False
 
-    scr_text = stripHTML(note[scr_field])
-    # showInfo(f'og text: {note[scr_field]}\nsearch text: {scr_text}')
+    src_text = stripHTML(note[src_field])
+    # showInfo(f'og text: {note[src_text]}\nsearch text: {src_text}')
     # source field is blank
-    if not scr_text:
+    if not src_text or not any_kanji(src_text):
         return False
 
     mnemonic_string_list: List[str] = []
 
-    vocab_subject: Optional[WkSubject] = wankani_vocab(scr_text)
+    vocab_subject: Optional[WkSubject] = wankani_vocab(src_text)
 
     if vocab_subject:
         mnemonic_string_list.append(': '.join([
-            f'<vocabulary>{scr_text}</vocabulary>',
+            f'<vocabulary>{src_text}</vocabulary>',
             f'<b>{vocab_subject.meaning}</b>'
         ]))
         vocab_mnemonic = (vocab_subject.reading_mnemonic
@@ -84,13 +84,16 @@ def add_wk_mnemonic_to_note(
         mnemonic_string_list.append(vocab_mnemonic)
     else:
         mnemonic_string_list.append(
-            f'<vocabulary>{scr_text}</vocabulary>: <b>Unknown</b><br>'
-            f"~😿 We couldn't find a mnemonic for {scr_text} on wanikani, "
+            f'<vocabulary>{src_text}</vocabulary>: <b>Unknown</b><br>'
+            f"~😿 We couldn't find a mnemonic for {src_text} on wanikani, "
             "But we encourage you to try writing your own! 😺~")
 
     if individual:
-        kanji_only = strip_out_kanji(note[scr_field])
+        kanji_only = strip_out_kanji(note[src_field])
         for kanji in kanji_only:
+            # TODO Only use the wanikani kanji if there is no radical of the same character
+            # Since the kanji mneumonic will just say its the same as the radical
+            # TODO also consider add a configurable item to add radical mnemonics
             kanji_subject: Optional[WkSubject] = wankani_kanji(kanji)
             if kanji_subject:
                 mnemonic_string_list.append(': '.join([
@@ -144,3 +147,7 @@ def is_kanji(char: str):
     # https://en.wikipedia.org/wiki/CJK_Unified_Ideographs#CJK_Unified_Ideographs_blocks
     # https://stackoverflow.com/questions/30069846/how-to-find-out-chinese-or-japanese-character-in-a-string-in-python
     return ord(u"\u4e00") <= ord(char) <= ord(u"\u9fff")
+
+
+def any_kanji(src_text: str):
+    return any(is_kanji(char) for char in src_text)

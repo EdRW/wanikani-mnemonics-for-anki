@@ -1,14 +1,8 @@
 from typing import Dict, List, Optional
 import urllib3
 import json
-from . import config
+from . import get_config
 from .models import WkCollection, WkObjectType, WkSubject, wk_subject_factory
-
-API_TOKEN = config['wanikaniApiKey']
-BASE_URL = 'https://api.wanikani.com/v2'
-endpoint = 'subjects'
-headers = {'Authorization': 'Bearer ' + API_TOKEN}
-search_url = 'https://www.wanikani.com/search'
 
 InternalWkCache = Dict[str, WkSubject]
 
@@ -40,6 +34,11 @@ counter = 0
 
 
 def search_wk(slug: str):
+    API_TOKEN = get_config()['wanikaniApiKey']
+    BASE_URL = 'https://api.wanikani.com/v2'
+    endpoint = 'subjects'
+    headers = {'Authorization': 'Bearer ' + API_TOKEN}
+
     url = '/'.join([BASE_URL, endpoint]) + f'?slugs={slug}'
     response = http.request('GET', url, headers=headers)
 
@@ -56,6 +55,7 @@ def search_wk(slug: str):
     except KeyError:
         empty_list: List[WkSubject] = []
         return empty_list
+    # TODO Find a way to cache requests that come back empty as well
     for wk_subject in wk_subjects:
         cache.set(slug, wk_subject)
     return wk_subjects
