@@ -29,7 +29,7 @@ def unfocus_callback(changed: bool, note: Note,
     # change config without restarting Anki
     config = get_config()
     if not config.get('auto_mode', False):
-        return False
+        return changed
 
     source_field_name = config['source_field']
     meaning_mnemonic_field_name = config['meaning_mnemonic_field']

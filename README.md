@@ -55,3 +55,9 @@ radical {
   color: #fff;
 }
 ```
+
+## Development
+
+### Todo List
+
+- [ ] Option to include links to wanikani page to the mnemonic or replace mnemonic entirely with just the link
