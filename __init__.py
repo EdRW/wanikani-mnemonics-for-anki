@@ -82,7 +82,9 @@ def context_menu_callback(editor_webview: EditorWebView, menu: QMenu) -> None:
             note=note,
             src_field=source_field_name,
             mnemonic_field=meaning_mnemonic_field_name,
-            get_kanji_mnemonics=get_kanji_mnemonics)
+            get_vocab_mnemonics=get_vocab_mnemonics,
+            get_kanji_mnemonics=get_kanji_mnemonics,
+            get_radical_mnemonics=get_radical_mnemonics)
         if success:
             editor_webview.editor.loadNote()
             # if note.id:

@@ -1,5 +1,5 @@
 from typing import Dict, List, Optional
-import urllib3
+import urllib3.poolmanager as urllib3
 import json
 from . import get_config
 from .models import WkCollection, WkObjectType, WkSubject, wk_subject_factory
